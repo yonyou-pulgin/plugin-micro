@@ -8,21 +8,25 @@
 import microApp from '@micro-zoe/micro-app'
 export default {
   name: 'App',
-  components: {
-    microApp
-  },
+  components: {},
   data () {
     return {
       url: 'https://www.yygongzi.com/plugin/index.html#/'
     }
   },
   created () {
-    if (process.env.NODE_ENV !== 'development') {
-      this.url  = (process.env.VUE_APP_API_URL || 'https://www.yygongzi.com') + `${process.env.VUE_APP_API_prefix}/plugin/index.html#/`
+    if(window.localStorage.getItem('plugin_prefix')) {
+      const plugin_prefix = window.localStorage.getItem('plugin_prefix')
+      this.url = `https://${plugin_prefix}.yygongzi.com/${plugin_prefix}plugin/index.html#/`
+    } else if (process.env.NODE_ENV !== 'development' && !window.location.href.includes('127.0.0.1')) {
+      this.url  = (process.env.VUE_APP_API_URL || 'https://www.yygongzi.com/') + `${process.env.VUE_APP_API_prefix}plugin/index.html#/`
     } else {
-      this.url = 'https://127.0.0.1:8089'
+      this.url = 'https://www.yygongzi.com/plugin/#/'
     }
-    microApp.start()
+    microApp.start({
+      'disable-memory-router': true, // 关闭虚拟路由系统
+      'disable-patch-request': true, // 关闭对子应用请求的拦截
+    })
   }
 }
 </script>
